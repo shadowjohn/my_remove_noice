@@ -9,6 +9,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
+using NAudio.Wave;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 //using System.Reflection;
@@ -804,6 +805,46 @@ namespace utility
                 // 在捕獲異常時返回 false，表示刪除失敗
                 return false;
             }
+        }
+        public float[] wavToFloatArr(string wavFile)
+        {
+            var audioFileReader = new AudioFileReader(wavFile);
+            var sourceProvider = audioFileReader.ToWaveProvider();
+
+            // 计算要读取的样本数
+            int totalSamples = (int)audioFileReader.Length / (audioFileReader.WaveFormat.BitsPerSample / 8);
+
+            // 创建一个 float 数组来存储音频数据
+            byte[] audioData = new byte[totalSamples];
+
+            int bytesRead = 0;
+            int offset = 0;
+
+            while (offset < totalSamples)
+            {
+                // 从音频文件中读取数据
+                int samplesToRead = Math.Min(sourceProvider.WaveFormat.SampleRate, totalSamples - offset);
+                bytesRead = sourceProvider.Read(audioData, offset, samplesToRead);
+
+                if (bytesRead == 0)
+                    break;
+
+                offset += bytesRead;
+            }
+
+            // 关闭文件读取器
+            audioFileReader.Dispose();
+
+
+            int sampleCount = audioData.Length / 4; // 假设每个浮点数占用 4 个字节
+
+            float[] floatArray = new float[sampleCount];
+
+            for (int i = 0; i < sampleCount; i++)
+            {
+                floatArray[i] = BitConverter.ToSingle(audioData, i * 4);
+            }
+            return floatArray;
         }
         public string system_background(string command, int timeout)
         {

@@ -15,7 +15,7 @@ namespace my_remove_noice
             public bool isInputMP4 = false;
             public bool isOutputMP4 = false;
             public string tempPath = string.Empty;
-            public string tempMP3 = string.Empty;
+            public string tempWAV = string.Empty;
         };
         public static myinclude my = new myinclude();
         public static myapp App = new myapp();
@@ -79,16 +79,17 @@ options:
             }
 
             setting.tempPath = my.pwd() + "\\temp\\" + my.time();
-            setting.tempMP3 = setting.tempPath + "\\" + my.time() + ".mp3";
+            setting.tempWAV = setting.tempPath + "\\" + my.time() + ".wav";
 
             //開始
             //step1. 建立暫存目錄
             App.step1CreatePath(setting.tempPath);
 
-            //step2. 變 temp mp3
-            App.step2FileToMp3(setting.sourceFile, setting.tempMP3);
+            //step2. 變 temp wav
+            App.step2FileToWAV(setting.sourceFile, setting.tempWAV);
 
             //step3. 處影聲音爆聲問題
+            App.step3FixNoise(setting.tempWAV);
 
             //step4. 輸出結果
             App.step4Output();

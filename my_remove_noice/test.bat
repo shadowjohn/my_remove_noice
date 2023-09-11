@@ -1,1 +1,1 @@
-my_remove_noice.exe test.mp4 -o output.mp4
+my_remove_noice.exe test.mp4 -o output.mp3
