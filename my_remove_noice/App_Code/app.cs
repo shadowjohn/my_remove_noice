@@ -69,7 +69,7 @@ namespace utility
                 this.sourceProvider = sourceProvider;
                 this.boostFactor = boostFactor;
             }
-           
+
             public byte[] ConvertFloatArrayToByteArray(float[] floatArray)
             {
                 byte[] byteArray = new byte[floatArray.Length * 4]; // Each float is 4 bytes
@@ -115,7 +115,7 @@ namespace utility
 
                 return floatArray;
             }
-            
+
             public int Read(float[] buffer, int offset, int count)
             {
 
@@ -123,7 +123,7 @@ namespace utility
                 //int samplesRead = sourceProvider.Read(buffer, offset, count);                
                 sourceProvider.ToMono();
                 int samplesRead = sourceProvider.Read(buffer, offset, count);
-                
+
                 /*
                 {
                     Attack = 0.01f, // 調整攻擊時間
@@ -145,48 +145,87 @@ namespace utility
 
                 //var NoisePassFilter = BiQuadFilter.(44100, 100.0f, 1.0f);
 
-                int step = 0;
                 float[] buffer_find_point = new float[buffer.Length];
 
-                Array.Copy(buffer, buffer_find_point, buffer.Length);
-
-
-                for (int n = 0; n < samplesRead; n++)
+                //Array.Copy(buffer, buffer_find_point, buffer.Length);
+                float max_minus = 0;
+                for (int n = 1; n < samplesRead - 1; n++)
                 {
-                    //buffer_find_point[n] = HighPassFilter.Transform(buffer_find_point[n]);
-                    //buffer_find_point[n] = LowPassFilter.Transform(buffer_find_point[n]);
-                    //buffer_find_point[n] = LowPassFilter.Transform(buffer_find_point[n]);
-                    //buffer_find_point[n] = LowPassFilter.Transform(buffer_find_point[n]);
-                    //buffer_find_point[n] /= 1.6f;
-                    //my.myLog(buffer_find_point[n].ToString());
-                }
-
-                for (int n = 0; n < samplesRead; n++)
-                {
-                    // Apply the boost factor to the high-frequency samples
-                    //if (n % sourceProvider.WaveFormat.Channels == 0)
+                    while (Math.Abs(buffer[n] - buffer[n - 1]) > 0.01)
                     {
-                        buffer[n] = HighPassFilter.Transform(buffer[n]);
-                        buffer[n] = LowPassFilter.Transform(buffer[n]);
-
-                        //byte[] b = ConvertFloatArrayToByteArray(buffer);
-                        // 使用壓縮器處理音訊樣本
-
-                        //buffer[n] = LowPassFilter.Transform(buffer[n]);
-                        //buffer[n] = LowPassFilter.Transform(buffer[n]);
-                        //buffer[n] *= 1.6f;
-                        ////buffer[n] = LowPassFilter.Transform(buffer[n]);
-                        //buffer[n] /= 1.6f;
-
-                        //buffer[n] = LowPassFilter.Transform(buffer[n]);
-                        //buffer_find_point[offset + n] = (float)Math.Pow(buffer_find_point[offset + n], 2);
-
+                        float mm = Math.Abs(buffer[n] - buffer[n - 1]);
+                        //max_minus = (mm > max_minus) ? mm : max_minus;
+                        //if (mm >= 0.02)
+                        {
+                            buffer[n] = (buffer[n] + buffer[n - 1]) / 2.0f;
+                        }
                     }
                 }
-                tempFloat = new float[buffer.Length];
-                Array.Copy(buffer, tempFloat, buffer.Length);
+                for (int n = 1; n < samplesRead - 1; n++)
+                {
+                    //buffer[n] = HighPassFilter.Transform(buffer[n]);
+                    buffer[n] = LowPassFilter.Transform(buffer[n]);
+                }
+                //Console.WriteLine("max_minus: " + max_minus);
+
+                if (false)
+                {
+                    for (int n = 99999999; n < samplesRead; n++)
+                    {
+                        //buffer[n] = HighPassFilter.Transform(buffer[n]);
+                        //buffer[n] = LowPassFilter.Transform(buffer[n]);                   
+                        //buffer[n] = HighPassFilter.Transform(buffer[n]);
+                        //buffer[n] = LowPassFilter.Transform(buffer[n]);
+                        //buffer[n] = (float)my.arduino_map(buffer[n], 0.0, 0.001, 0.0, 1.0);
+                        //buffer[n] = (float)my.arduino_map(buffer[n], 0.1, 1.0, 0.3, 1.0);
+                        if (buffer[n] > 0)
+                        {
+                            buffer[n] *= (float)0.1;
+                        }
+                        else if (buffer[n] < 0)
+                        {
+                            buffer[n] *= (float)0.1;
+                        }
+                        else
+                        {
+                            //buffer[n] = 0;
+                        }
+                        buffer[n] = (float)my.arduino_map(buffer[n], 0.01, 0.1, 0.95, 1.0);
+                        buffer[n] = HighPassFilter.Transform(buffer[n]);
+                        buffer[n] = LowPassFilter.Transform(buffer[n]);
+                        if ((buffer[n] > 0.01 || buffer[n] < -0.01) && n - 1 >= 2)
+                        {
+                            //Console.WriteLine(buffer[n]);
+                            //buffer[n] = buffer_find_point[n];
+                            buffer[n] = buffer_find_point[n - 2];
+                            //buffer[n] = 0;
+                        }
+                        else
+                        {
+                            buffer[n] = buffer_find_point[n];
+                        }
+                    }
+                }
+
+                //buffer_find_point[n] = HighPassFilter.Transform(buffer_find_point[n]);
+                //buffer_find_point[n] = LowPassFilter.Transform(buffer_find_point[n]);
+
+                ////buffer[n] = LowPassFilter.Transform(buffer[n]);
+                //buffer[n] /= 1.6f;
+
+                //buffer[n] = LowPassFilter.Transform(buffer[n]);
+                //buffer_find_point[offset + n] = (float)Math.Pow(buffer_find_point[offset + n], 2);
+
+                for (int n = 0; n < samplesRead; n++)
+                {
+                    // buffer[n] *= 1.6f;
+                }
+
+                //tempFloat = new float[buffer.Length];
+                //Array.Copy(buffer, tempFloat, buffer.Length);
                 return samplesRead;
             }
+
             public List<int> FindChangePoints(float[] audioData, float threshold)
             {
                 List<int> changePoints = new List<int>();

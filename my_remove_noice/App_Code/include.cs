@@ -886,6 +886,10 @@ namespace utility
             }
             return sb.ToString();
         }
+        public double arduino_map(double x, double inMin, double inMax, double outMin, double outMax)
+        {
+            return (x - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
+        }
     }
 
 }
