@@ -890,6 +890,43 @@ namespace utility
         {
             return (x - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
         }
+        public  double arduino_map(double x, double inMin, double inMax, double outMin, double outMax, double acceleration)
+        {
+            // 将输入值限制在输入范围内
+            x = Constrain(x, inMin, inMax);
+
+            // 计算符号
+            double sign = Math.Sign(x);
+
+            // 对输入值进行绝对值和归一化，即将其映射到 0 到 1 的范围
+            double absX = Math.Abs(x);
+            double normalizedX = (absX - inMin) / (inMax - inMin);
+
+            // 应用加速度效果
+            double acceleratedX = Math.Pow(normalizedX, acceleration);
+
+            // 将加速后的值映射到输出范围
+            double mappedValue = sign * (outMin + (outMax - outMin) * acceleratedX);
+
+            return mappedValue;
+        }
+
+        // 用于将值限制在范围内的辅助函数
+        private static double Constrain(double value, double min, double max)
+        {
+            if (value < min)
+            {
+                return min;
+            }
+            else if (value > max)
+            {
+                return max;
+            }
+            else
+            {
+                return value;
+            }
+        }
     }
 
 }

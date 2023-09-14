@@ -43,6 +43,7 @@ options:
         public static settingEntity setting = new settingEntity();
         static void Main(string[] args)
         {
+            Int64 st = Convert.ToInt32(my.time());
 
             for (int i = 0; i < args.Length; i++)
             {
@@ -93,6 +94,10 @@ options:
 
             //step4. 輸出結果
             App.step4Output();
+
+            Int64 et = Convert.ToInt32(my.time());
+
+            my.myLog("轉檔時間: " + (et - st).ToString() + " 秒");
         }
     }
 
