@@ -113,38 +113,47 @@ namespace utility
 
                 //Array.Copy(buffer, buffer_find_point, buffer.Length);
 
-                for (int n = 1; n < samplesRead; n++)
+                for (int n = 3; n < samplesRead - 3; n++)
                 {
-                    if (Math.Abs(buffer[n] - buffer[n - 1]) > 0.006)
+                    //while (Math.Abs(buffer[n + 1] - buffer[n]) > 0.001)
                     {
-                        while (Math.Abs(buffer[n] - buffer[n - 1]) > 0.003)
+                        //float mm = Math.Abs(buffer[n] - buffer[n - 1]);
+                        //max_minus = (mm > max_minus) ? mm : max_minus;
+                        //if (mm >= 0.02)
                         {
-                            float mm = Math.Abs(buffer[n] - buffer[n - 1]);
-                            //max_minus = (mm > max_minus) ? mm : max_minus;
-                            //if (mm >= 0.02)
-                            {
-                                buffer[n] = (buffer[n] + buffer[n - 1]) / 2.0f;
-                            }
+                            //buffer[n] = (buffer[n + 1] + buffer[n]) / 2.0f;
                         }
                     }
+                    while (Math.Abs(buffer[n] - buffer[n - 2]) > 0.01)
+                    {
+                        //float mm = Math.Abs(buffer[n] - buffer[n - 1]);
+                        //max_minus = (mm > max_minus) ? mm : max_minus;
+                        //if (mm >= 0.02)
+                        {
+                            buffer[n] = (buffer[n - 2] + buffer[n]) / 2.0f;
+                        }
+                    }
+                    
                 }
-                float maxM = 0;
+                /*float maxM = 0;
                 float minM = 0;
                 for (int n = 0; n < samplesRead; n++)
                 {
-                    maxM = (buffer[n] > maxM) ? buffer[n] : maxM;
-                    minM = (buffer[n] < minM) ? buffer[n] : minM;
+                    //maxM = (buffer[n] > maxM) ? buffer[n] : maxM;
+                    //minM = (buffer[n] < minM) ? buffer[n] : minM;
                     //buffer[n] = HighPassFilter.Transform(buffer[n]);
                     //buffer[n] = LowPassFilter.Transform(buffer[n]);
 
                 }
-                Console.WriteLine("minM: " + minM);
-                Console.WriteLine("maxM: " + maxM);
+                */
+                //Console.WriteLine("minM: " + minM);
+                //Console.WriteLine("maxM: " + maxM);
+                /*
                 for (int n = 1; n < samplesRead; n++)
                 {
                     if (Math.Abs(buffer[n]) < 0.1 && buffer[n] > 0)
                     {
-                        buffer[n] = (float)my.arduino_map(buffer[n], 0.0f, 0.1f, 0f, 0.1f, 1.4f);
+                        //buffer[n] = (float)my.arduino_map(buffer[n], 0.0f, 0.1f, 0f, 0.1f, 1.4f);
                         //buffer[n] *= 0.8f;
                     }
                     else
@@ -155,7 +164,7 @@ namespace utility
                     //buffer[n] = HighPassFilter.Transform(buffer[n]);
                     //buffer[n] = LowPassFilter.Transform(buffer[n]);
                 }
-                
+                */
                 //tempFloat = new float[buffer.Length];
                 //Array.Copy(buffer, tempFloat, buffer.Length);
                 return samplesRead;
